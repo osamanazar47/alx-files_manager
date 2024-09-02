@@ -1,15 +1,18 @@
 import redisClient from '../utils/redis';
 import dbClient from '../utils/db';
 
-const getStatus = (req, res) => {
-  if (redisClient.isAlive() && dbClient.isAlive()) {
-    return res.status(200).json({ "redis": true, "db": true });
+export default class AppController {
+  static getStatus(req, res) {
+    res.status(200).json({
+      redis: redisClient.isAlive(),
+      db: dbClient.isAlive(),
+    });
   }
-  return res.status(500).json({ "redis": false, "db": false }); // Example of handling failure
-};
 
-const getStats = (req, res) => {
-  return res.status(200).json({ "users": dbClient.nbUsers(), "files": dbClient.nbFiles() });
-};
-
-export { getStatus, getStats };
+  static getStats(req, res) {
+    Promise.all([dbClient.nbUsers(), dbClient.nbFiles()])
+      .then(([usersCount, filesCount]) => {
+        res.status(200).json({ users: usersCount, files: filesCount });
+      });
+  }
+}
