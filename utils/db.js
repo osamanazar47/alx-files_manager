@@ -57,6 +57,18 @@ class DBClient {
       return 0;
     }
   }
+
+  async usersCollection() {
+    return this.client.db().collection('users');
+  }
+
+  /**
+   * Retrieves a reference to the `files` collection.
+   * @returns {Promise<Collection>}
+   */
+  async filesCollection() {
+    return this.client.db().collection('files');
+  }
 }
 
 export const dbClient = new DBClient();

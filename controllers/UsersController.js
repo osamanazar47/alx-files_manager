@@ -6,21 +6,20 @@ export default class UsersCotroller {
   static async postNew(req, res) {
     const { email, password } = req.body;
     if (!email) {
-      res.status(400).error('Missing email');
+      return res.status(400).json({ error: 'Missing email' });
     }
     if (!password) {
-      res.status(400).error('Missing password');
+      return res.status(400).json({ error: 'Missing password' });
     }
-
     try {
-      const existUser = dbClient.db.collection().findOne({ email });
+      const existUser = await (await dbClient.usersCollection()).findOne({ email });
       if (existUser) {
         res.status(400).json({ error: 'Already exists' });
       }
 
       const hashedPassword = sha1(password);
 
-      const result = await dbClient.db.collection('users').insertOne({
+      const result = await dbClient.usersCollection().insertOne({
         email,
         password: hashedPassword,
       });
