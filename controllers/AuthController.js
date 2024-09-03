@@ -10,7 +10,8 @@ export default class AuthController {
     const encodedCredentials = authHeader.split(' ')[1];
     const credentials = Buffer.from(encodedCredentials, 'base64').toString('utf-8');
     const [email, password] = credentials.split(':');
-    const user = await (await dbClient.usersCollection()).findOne({ email, password: sha1(password) });
+    const hashP = sha1(password);
+    const user = await (await dbClient.usersCollection()).findOne({ email, password: hashP });
     if (!user) {
       res.status(401).json({ error: 'Unauthorized' });
     }

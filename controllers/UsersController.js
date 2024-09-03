@@ -45,7 +45,7 @@ export default class UsersController {
     }
 
     // Retrieve the user from the database
-    const user = await (await dbClient.usersCollection()).findOne({ _id:new ObjectId(userId) });
+    const user = await (await dbClient.usersCollection()).findOne({ _id: new ObjectId(userId) });
     if (!user) {
       // If no user is found in the database, respond with unauthorized error
       return res.status(401).json({ error: 'Unauthorized' });
