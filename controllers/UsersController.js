@@ -52,7 +52,7 @@ export default class UsersController {
     }
 
     // Respond with the user object containing email and id
-    res.status(200).json({
+    return res.status(200).json({
       id: user._id.toString(),
       email: user.email,
     });
