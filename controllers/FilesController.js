@@ -82,4 +82,52 @@ export default class FilesController {
       return res.status(500).json({ error: 'Could not save file to the database' });
     }
   }
+
+  static async getShow(req, res) {
+    const token = req.headers['x-token'];
+    const userId = await redisClient.get(`auth_${token}`);
+
+    if (!userId) {
+      return res.status(401).json({ error: 'Unauthorized' });
+    }
+
+    const fileId = req.params.id;
+    const file = await (await dbClient.filesCollection()).findOne({
+      _id: new ObjectId(fileId),
+      userId: new ObjectId(userId),
+    });
+
+    if (!file) {
+      return res.status(404).json({ error: 'Not found' });
+    }
+
+    return res.status(200).json(file);
+  }
+
+  static async getIndex(req, res) {
+    const token = req.headers['x-token'];
+    const userId = await redisClient.get(`auth_${token}`);
+
+    if (!userId) {
+      return res.status(401).json({ error: 'Unauthorized' });
+    }
+
+    const parentId = req.query.parentId || '0';
+    const page = parseInt(req.query.page, 10) || 0;
+    const pageSize = 20;
+    const skip = page * pageSize;
+
+    const query = {
+      userId: new ObjectId(userId),
+      parentId: parentId === '0' ? '0' : new ObjectId(parentId),
+    };
+
+    const files = await (await dbClient.filesCollection())
+      .find(query)
+      .skip(skip)
+      .limit(pageSize)
+      .toArray();
+
+    return res.status(200).json(files);
+  }
 }
